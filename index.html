@@ -1,0 +1,129 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="/assets/plugins/bootstrap/css/bootstrap.min.css">
+
+    <title>Adres Kayıt Sistemi</title>
+</head>
+<body>
+
+<div class="container">
+    <div class="row">
+        <div class="col">
+            <div class="card mt-5">
+                <div class="card-body">
+                    <h5 class="card-title">Adresler</h5>
+                    <h6 class="card-subtitle mb-2 text-muted">NVİ Adres Kayıt Sistemi</h6>
+                    <div class="form-group">
+                        <label>Ülke</label>
+                        <select name="country_id" id="country_id" class="form-control">
+                            <option value="0"> -  Ülke - </option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Şehir</label>
+                        <select name="city_id" id="city_id" class="form-control" disabled>
+                            <option value="0"> -  Ülke Seçiniz - </option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>İlçe</label>
+                        <select name="county_id" id="county_id" class="form-control" disabled>
+                            <option value="0"> -  Şehir Seçiniz - </option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Mahalle/Köy</label>
+                        <select name="neighborhood_id" id="neighborhood_id" class="form-control" disabled>
+                            <option value="0"> -  İlçe Seçiniz - </option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<!-- Optional JavaScript -->
+<!-- jQuery first, then Popper.js, then Bootstrap JS -->
+<script src="/assets/plugins/jquery/jquery-3.3.1.min.js"></script>
+<script src="/assets/plugins/jquery/popper.min.js"></script>
+<script src="/assets/plugins/bootstrap/js/bootstrap.min.js"></script>
+<script>
+
+    function getData(url, response, placeholder) {
+        response.html('<option value="0" selected> - LÜTFEN BEKLEYİNİZ... - </option>');
+        $.ajax({
+            type: "GET",
+            url: url,
+            cache: false,
+            dataType: 'html',
+            success: function(view) {
+                response.prop('disabled',false);
+                response.html('<option value="0" selected> - '+ placeholder +' - </option>');
+                var parse = JSON.parse(view);
+                $.each(parse, function(idx, obj) {
+                    response.append($('<option>', {
+                        value: obj.kimlikNo,
+                        text : obj.bilesenAdi
+                    }));
+                });
+            }
+        });
+    }
+
+
+    $(document).ready(function () {
+
+        $( "#country_id" ).change(function() {
+            var id = $(this).find(":selected").val();
+            var response = $("#city_id");
+            getData("/data.php?type=city&country_id="+id, response, 'Şehir Seçiniz');
+            $("#county_id").html("").prop('disabled',true);
+            $("#neighborhood_id").html("").prop('disabled',true);
+        });
+
+        $( "#city_id" ).change(function() {
+            var id = $(this).find(":selected").val();
+            var response = $("#county_id");
+            getData("/data.php?type=county&city_id="+id, response, 'İlçe Seçiniz');
+            $("#county_id").html("").prop('disabled',true);
+            $("#neighborhood_id").html("").prop('disabled',true);
+        });
+
+        $( "#county_id" ).change(function() {
+            var id = $(this).find(":selected").val();
+            var response = $("#neighborhood_id");
+            getData("/data.php?type=neighborhood&county_id="+id, response, 'Mahalle/Köy Seçiniz');
+        });
+
+        $.ajax({
+            type: "GET",
+            url: "/data.php?type=country",
+            cache: false,
+            dataType: 'html',
+            success: function(view) {
+                var parse = JSON.parse(view);
+                $.each(parse, function(idx, obj) {
+                    $('#country_id').append($('<option>', {
+                        value: obj.country_id,
+                        text : obj.name
+                    }));
+                });
+            }
+        });
+
+
+    });
+</script>
+</body>
+</html>

@@ -1,0 +1,11 @@
+{
+    "description": "Türkiye'deki adresler",
+    "name": "empatisoft/adresler",
+    "type": "project",
+    "homepage": "https://empatisoft.com",
+    "license": "MIT",
+    "require": {
+        "php": ">=7.3.8",
+        "ext-json": "*"
+    }
+}
